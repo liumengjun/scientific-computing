@@ -165,13 +165,53 @@ public class Polynomial {
 		return str;
 	}
 	
+	public static Double solveOne(double[] f) {
+		return solveOne(f, 0);
+	}
+	
+	public static Double solveOne(double[] f, double start) {
+		return solveOne0(f, start);
+	}
+	
+	/**
+	 * 牛顿逼近法
+	 * NOTE: 需要选取恰当的迭代起始点
+	 * @param f
+	 * @param x
+	 * @return
+	 */
+	private static Double solveOne0(double[] f, double x) {
+		double[] fd = derivative(f);
+		final double tolerance = 0.00000000001;
+		final double tolerance2 = 0.000001;
+		
+		double y = value(f, x);
+		int max_times = 1000;
+		do {
+			if (Math.abs(y) < tolerance) {
+				return x;
+			}
+			double k = value(fd, x);
+			if (Math.abs(k) < tolerance && Math.abs(y) > tolerance2) {
+				return null;
+			}
+			x = x - y/k;   // new x
+			y = value(f, x); // new y
+			max_times--;
+		} while(max_times > 0);
+		if (Math.abs(y) < tolerance2) {
+			return x;
+		}
+		return null;
+	}
+	
 	//main
 	public static void main(String[] args){
 		
 		double[] x={-2,-1,0,1,2};
 		
 		double[] p1={1,1,1};
-		double[] p2={1,-1};
+		double[] p2={1,0,-1};
 		double[] p=multiply(p1, p2);
 
 		System.out.println("f1(x)is:");
@@ -186,8 +226,15 @@ public class Polynomial {
 		double[] y=value(p,x);
 		Matrix.showMatrix1D(y);
 		System.out.println(toString(p,1.2)+"="+value(p,1.2,true));
+
 		Polynomial.showFigure(p1);
 		Polynomial.showFigure(p2);
 		Polynomial.showFigure(p);
+
+		System.out.println("f1("+solveOne(p1)+") = 0");
+		System.out.println("f2("+solveOne(p2, 0.5)+") = 0");
+		System.out.println("f2("+solveOne(p2, -0.5)+") = 0");
+		System.out.println("f("+solveOne(p, 0.5)+") = 0");
+		System.out.println("f("+solveOne(p, -0.5)+") = 0");
 	}
 }
