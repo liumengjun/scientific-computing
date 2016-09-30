@@ -697,6 +697,7 @@ public class Matrix {
 			return;
 		for(int i=0;i<A.length;i++)
 			showMatrix1D(A[i],round);
+		System.out.println();
 	}
 
 	/**
@@ -711,6 +712,120 @@ public class Matrix {
 			for(int j=0;j<m;j++)
 				tranA[i][j]=A[j][i];
 		return tranA;
+	}
+	
+	/**
+	 * 互换矩阵两行(Ri<->Rj)
+	 * 
+	 * @param A
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	public static double[][] exchangeRow(double[][] A, int i, int j) {
+		if (A==null || i < 0 || j < 0 || i >= A.length || j >= A.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (i == j) {
+			return A;
+		}
+		double[] ri = A[i];
+		A[i] = A[j];
+		A[j] = ri;
+		return A;
+	}
+	
+	/**
+	 * 某一行元素乘以(Ri*k)
+	 * @param A
+	 * @param i
+	 * @param k
+	 * @return
+	 */
+	public static double[][] multiplyRow(double[][] A, int i, double k) {
+		if (A==null || i<0 || i>=A.length) {
+			throw new IllegalArgumentException();
+		}
+		for (int s=0; s<A[i].length; s++) {
+			A[i][s] *= k;
+		}
+		return A;
+	}
+	
+	/**
+	 * 某一行元素加上另一行的倍数(Ri+k*Rj)
+	 * @param A
+	 * @param i
+	 * @param j
+	 * @param k
+	 * @return
+	 */
+	public static double[][] addMultiplyRow(double[][] A, int i, int j, double k) {
+		if (A==null || i < 0 || j < 0 || i >= A.length || j >= A.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		for (int s=0; s<A[i].length; s++) {
+			A[i][s] += A[j][s] * k;
+		}
+		return A;
+	}
+	
+	/**
+	 * 互换矩阵两列(Ci<->Cj)
+	 * 
+	 * @param A
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	public static double[][] exchangeColumn(double[][] A, int i, int j) {
+		if (A==null || A.length == 0 || i < 0 || j < 0 || i >= A[0].length || j >= A[0].length) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (i == j) {
+			return A;
+		}
+		for (int t=0; t<A.length; t++) {
+			double d = A[t][i];
+			A[t][i] = A[t][j];
+			A[t][j] = d;
+		}
+		return A;
+	}
+	
+	/**
+	 * 某一列元素乘以(Ci*k)
+	 * @param A
+	 * @param i
+	 * @param k
+	 * @return
+	 */
+	public static double[][] multiplyColumn(double[][] A, int i, double k) {
+		if (A==null || A.length==0 || i<0 || i>=A[0].length) {
+			throw new IllegalArgumentException();
+		}
+		for (int t=0; t<A.length; t++) {
+			A[t][i] *= k;
+		}
+		return A;
+	}
+	
+	/**
+	 * 某一列元素加上另一列的倍数(Ci+k*Cj)
+	 * @param A
+	 * @param i
+	 * @param j
+	 * @param k
+	 * @return
+	 */
+	public static double[][] addMultiplyColumn(double[][] A, int i, int j, double k) {
+		if (A==null || A.length == 0 || i < 0 || j < 0 || i >= A[0].length || j >= A[0].length) {
+			throw new IndexOutOfBoundsException();
+		}
+		for (int t=0; t<A.length; t++) {
+			A[t][i] += A[t][j] * k;
+		}
+		return A;
 	}
 	
 	//main 测试以上方法
@@ -770,17 +885,27 @@ public class Matrix {
 		*/
 		
 		//double[][] A = {{1, 2, 3}, {5, 6, 4}, {3, 4, 5}};
-		double[][] A = { {0, 1}, {3, 4} };
-		double[][] invA = inverse(A);
-		System.out.println("消去法求invA:");
-		showMatrix2D(invA);
-		System.out.println("验证A*invA:");
-		showMatrix2D(matrixMultiply(A, invA),true);
+//		double[][] A = { {0, 1}, {3, 4} };
+//		double[][] invA = inverse(A);
+//		System.out.println("消去法求invA:");
+//		showMatrix2D(invA);
+//		System.out.println("验证A*invA:");
+//		showMatrix2D(matrixMultiply(A, invA),true);
+//		
+//		double[][] invA2 = inverse2(A);
+//		System.out.println("代数余子式法求invA2:");
+//		showMatrix2D(invA2);
+//		System.out.println("验证A*invA2:");
+//		showMatrix2D(matrixMultiply(A, invA2));
 		
-		double[][] invA2 = inverse2(A);
-		System.out.println("代数余子式法求invA2:");
-		showMatrix2D(invA2);
-		System.out.println("验证A*invA2:");
-		showMatrix2D(matrixMultiply(A, invA2));
+		double[][] B = {{1, 2, 3}, {5, 6, 4}, {3, 4, 5}};
+		showMatrix2D(B);
+//		exchangeRow(B, 1, 2);
+//		multiplyRow(B, 1, 1.5);
+//		addMultiplyRow(B, 1, 2, 1.0);
+//		exchangeColumn(B, 1, 2);
+//		multiplyColumn(B, 1, 1.5);
+		addMultiplyColumn(B, 1, 2, 0.5);
+		showMatrix2D(B);
 	}
 }
