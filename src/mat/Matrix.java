@@ -126,11 +126,12 @@ public class Matrix {
 	}
 	
 	/**
-	 * 求方阵A的特征值(eigenvalues)
+	 * 求方阵A的特征值(eigenvalues)<br>
+	 * (A - lambda * I)* X = o<br>
+	 * TODO: it's not implemented
 	 * @param A double[][] 待求矩阵,必须n*n
 	 * @return λ[i] double[][] 特征值
 	 */
-	@Deprecated
 	public static double[] eigenvalues(double[][] A){
 		return null;
 	}
@@ -622,11 +623,11 @@ public class Matrix {
 	
 	/**
 	 * 计算矩阵A的2范式<br>
-	 * (谱范数,即A'A特征值λi中最大者λm的平方根,其中A'为A的转置矩阵). 
+	 * (谱范数,即A'A特征值λi中最大者λm的平方根,其中A'为A的转置矩阵). <br>
+	 * TODO: it's not implemented
 	 * @param A 矩阵
 	 * @return A的2范式
 	 */
-	@Deprecated
 	public static double norm_2(double[][] A){
 		double max=0;
 		return max;
