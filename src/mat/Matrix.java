@@ -828,6 +828,22 @@ public class Matrix {
 		return A;
 	}
 	
+	/**
+	 * clone 2D matrix
+	 * @param A
+	 * @return copy of A
+	 */
+	public static double[][] clone(double[][] A) {
+		if (A==null) {
+			return null;
+		}
+		double[][] B = new double[A.length][];
+		for (int i = 0; i< A.length; i++) {
+			B[i] = A[i].clone();
+		}
+		return B;
+	}
+	
 	//main 测试以上方法
 	public static void main(String[] args){
 		/*
@@ -905,7 +921,15 @@ public class Matrix {
 //		addMultiplyRow(B, 1, 2, 1.0);
 //		exchangeColumn(B, 1, 2);
 //		multiplyColumn(B, 1, 1.5);
-		addMultiplyColumn(B, 1, 2, 0.5);
+//		addMultiplyColumn(B, 1, 2, 0.5);
+//		showMatrix2D(B);
+		
+		double[][] C = clone(B);
+		B[0][0] = 0;
 		showMatrix2D(B);
+		showMatrix2D(C);
+		C[1][1] = 1000;
+		showMatrix2D(B);
+		showMatrix2D(C);
 	}
 }
