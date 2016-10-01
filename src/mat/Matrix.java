@@ -843,6 +843,29 @@ public class Matrix {
 		}
 		return B;
 	}
+
+	/**
+	 * 用Cramer's Rule求解线性方程组(Linear systems) A*x=b
+	 * @param A 已知量,n*n矩阵
+	 * @param b 已知量,n*1向量
+	 * @return x 未知量,n*1向量,保存结果
+	 */
+	public static double[] solveOfCramerRule(double A[][],double b[]) {
+		int n=A.length;
+		if(n!=A[0].length || n!=b.length){
+			throw new IllegalArgumentException("各矩阵的长度不一致!!");
+		}
+		double detA = det(A);
+		double[] x = new double[A[0].length];
+		for (int j = 0; j < A[0].length; j++) {
+			double[][] Dj = clone(A);
+			for (int i=0; i<A.length; i++) {
+				Dj[i][j] = b[i];
+			}
+			x[j] = det(Dj)/detA;
+		}
+		return x;
+	}
 	
 	//main 测试以上方法
 	public static void main(String[] args){
@@ -914,22 +937,5 @@ public class Matrix {
 //		System.out.println("验证A*invA2:");
 //		showMatrix2D(matrixMultiply(A, invA2));
 		
-		double[][] B = {{1, 2, 3}, {5, 6, 4}, {3, 4, 5}};
-		showMatrix2D(B);
-//		exchangeRow(B, 1, 2);
-//		multiplyRow(B, 1, 1.5);
-//		addMultiplyRow(B, 1, 2, 1.0);
-//		exchangeColumn(B, 1, 2);
-//		multiplyColumn(B, 1, 1.5);
-//		addMultiplyColumn(B, 1, 2, 0.5);
-//		showMatrix2D(B);
-		
-		double[][] C = clone(B);
-		B[0][0] = 0;
-		showMatrix2D(B);
-		showMatrix2D(C);
-		C[1][1] = 1000;
-		showMatrix2D(B);
-		showMatrix2D(C);
 	}
 }
