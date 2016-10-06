@@ -58,5 +58,29 @@ public class MatrixTest {
 		showMatrix1D(x);
 		assertTrue(true);
 	}
+	
+	@Test
+	public void test_add() {
+		double[][] A = { { 3, 4, 9 }, { 3, 7, 5 }, { 8, 4, 0 } };
+		double[][] B = { { 1, 2, 3 }, { 5, 6, 4 }, { 3, 4, 5 } };
+		showMatrix2D(A);
+		showMatrix2D(B);
+		assertFalse(isEqual(A, B));
+		double[][] C = add(A,B);
+		double[][] D = add(B,A);
+		showMatrix2D(C);
+		showMatrix2D(D);
+		assertTrue(isEqual(C, D));
+		double[][] kA = multiply(A, 2);
+		double[][] kB = multiply(B, 2);
+		showMatrix2D(kA);
+		showMatrix2D(kB);
+		double[][] A2 = add(A,A);
+		double[][] B2 = add(B,B);
+		showMatrix2D(A2);
+		showMatrix2D(B2);
+		assertTrue(isEqual(kA, A2));
+		assertTrue(isEqual(kB, B2));
+	}
 
 }

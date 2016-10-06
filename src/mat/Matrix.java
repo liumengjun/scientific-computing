@@ -540,6 +540,58 @@ public class Matrix {
 			}
 		return C;
 	}
+
+	/**
+	 * 矩阵与数相乘k*A
+	 * @param A
+	 * @return k*A
+	 */
+	public static double[][] multiply(double[][] A, double k) {
+		double[][] kA = new double[A.length][A[0].length];
+		for (int i=0; i<A.length; i++) {
+			for (int j=0; j<A[0].length; j++) {
+				kA[i][j] = A[i][j] * k;
+			}
+		}
+		return kA;
+	}
+	
+	/**
+	 * 同型矩阵相加C=A+B
+	 * @param A
+	 * @param B
+	 * @return C
+	 */
+	public static double[][] add(double[][] A, double[][] B) {
+		if (A==null || B==null || A.length!=B.length || A[0].length!=B[0].length) {
+			throw new IllegalArgumentException("不是同型矩阵");
+		}
+		double[][] C = new double[A.length][A[0].length];
+		for (int i=0; i<A.length; i++) {
+			for (int j=0; j<A[0].length; j++) {
+				C[i][j] = A[i][j] + B[i][j];
+			}
+		}
+		return C;
+	}
+	
+	/**
+	 * 判断两矩阵是否相等
+	 * @param A
+	 * @param B
+	 * @return A==B
+	 */
+	public static boolean isEqual(double[][] A, double[][] B) {
+		if (A.length!=B.length) return false;
+		if (A[0].length!=B[0].length) return false;
+		boolean flag = true;
+		for (int i=0; i<A.length & flag; i++) {
+			for (int j=0; j<A[0].length & flag; j++) {
+				flag = flag && (A[i][j] == B[i][j]);
+			}
+		}
+		return flag;
+	}
 	
 	/**
 	 * 计算向量x的∞范式
