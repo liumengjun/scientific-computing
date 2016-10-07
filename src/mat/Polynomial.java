@@ -3,6 +3,48 @@ package mat;
 
 public class Polynomial {
 	
+	double[] fx; // 多项式f(x)各项的系数
+	
+	public Polynomial(double[] fx) {
+		this.setFx(fx);
+	}
+	
+	public void setFx(double[] fx) {
+		if (fx != null) {
+			this.fx = fx.clone();
+		} else {
+			this.fx = null;
+		}
+	}
+	
+	public double[] getFx() {
+		if (this.fx ==  null) {
+			return null;
+		}
+		return fx.clone();
+	}
+	
+	public void resetFx(double[] fx) {
+		this.fx = fx;
+	}
+	
+	/**
+	 * 常数
+	 * @param c
+	 */
+	public Polynomial(double c) {
+		this.fx = new double[]{c};
+	}
+	
+	/**
+	 * f(x) = a*x + c
+	 * @param c
+	 * @param a
+	 */
+	public Polynomial(double c, double a) {
+		this.fx = new double[]{c, a};
+	}
+	
 	/**
 	 * 求多项式f(x)的导数f'(x)
 	 * @param fx存f(x)各项的系数
@@ -14,6 +56,10 @@ public class Polynomial {
 		for(int i=1;i<n;i++)
 			df[i-1]=i*fx[i];
 		return df;
+	}
+	
+	public Polynomial derivative() {
+		return new Polynomial(Polynomial.derivative(this.fx));
 	}
 	
 	/**
@@ -30,6 +76,144 @@ public class Polynomial {
 			for(int j=0;j<n2;j++)
 				newPoly[i+j]+=p1[i]*p2[j];
 		return newPoly;
+	}
+	
+	public Polynomial multiply(Polynomial g) {
+		return new Polynomial(Polynomial.multiply(this.fx, g.fx));
+	}
+	
+	/**
+	 * 乘以常数k
+	 * @param k
+	 * @return g(x)=k*f(x)
+	 */
+	public Polynomial multiply(double k) {
+		double[] gx = new double[this.fx.length];
+		for (int i=0; i<gx.length; i++) {
+			gx[i] = this.fx[i] * k;
+		}
+		return new Polynomial(gx);
+	}
+	
+	/**
+	 * 多项式相加
+	 * @param gx
+	 * @return h(x) = g(x) + f(x)
+	 */
+	public Polynomial add(Polynomial g) {
+		double[] fx = this.fx, gx = g.fx;
+		double[] hx = new double[Math.max(fx.length, gx.length)];
+		int i=0, min = Math.min(fx.length, gx.length);
+		while (i < min) {
+			hx[i] = gx[i] + fx[i];
+			i++;
+		}
+		double[] mx = (i < fx.length)?fx:gx;
+		while (i < mx.length) {
+			hx[i] = mx[i];
+			i++;
+		}
+		return new Polynomial(hx);
+	}
+	
+	/**
+	 * negative itself
+	 * @return itself
+	 */
+	public Polynomial negativeSelf() {
+		if (this.fx == null) return this;
+		for (int i=0; i<this.fx.length; i++) {
+			this.fx[i] = -this.fx[i];
+		}
+		return this;
+	}
+
+	
+	/**
+	 * negative of this
+	 * @return new one
+	 */
+	public Polynomial negative() {
+		Polynomial g = this.clone();
+		if (this.fx == null) {
+			return g;
+		}
+		for (int i=0; i<g.fx.length; i++) {
+			g.fx[i] = -g.fx[i];
+		}
+		return g;
+	}
+	
+	/**
+	 * 除以多项式g
+	 * @param g g(x)
+	 * @return 常数 k=f(x)/g(x) or NULL
+	 */
+	public Double divideBy(Polynomial g) {
+		double[] fx = this.fx, gx = g.fx;
+		if (fx.length != gx.length || fx.length == 0 || g.isZero()) {
+			throw new IllegalArgumentException();
+		}
+		double k = 0; // 确定基准值
+		int i=0, N=fx.length;
+		for (; i<N; i++) {
+			if (gx[i]!=0) {
+				k = fx[i]/gx[i];
+				break;
+			}
+		}
+		// 检查每一项比值都为k
+		for (; i<N; i++) {
+			if (gx[i]!=0 && fx[i]/gx[i] != k) {
+				return null;
+			}
+		}
+		return k;
+	}
+	
+	/**
+	 * 多项式是否是0
+	 * @return
+	 */
+	public boolean isZero() {
+		double[] fx = this.fx;
+		if (fx==null || fx.length==0) {
+			return true;
+		}
+		boolean flag = true;
+		for (int i=0; flag && i<fx.length; i++) {
+			flag = flag && (fx[i] == 0.0);
+		}
+		return flag;
+	}
+	
+	/**
+	 * 多项式是否是与另一多项式相等
+	 * @return
+	 */
+	public boolean isEqual(Polynomial g) {
+		double[] fx = this.fx, gx = g.fx;
+		if (fx == gx) {
+			return true;
+		}
+		if (fx == null || gx == null || fx.length != gx.length) {
+			return false;
+		}
+		boolean flag = true;
+		for (int i=0; flag && i<fx.length; i++) {
+			flag = flag && (fx[i] == gx[i]);
+		}
+		return flag;
+	}
+	
+	public boolean equals(Object g) {
+		if (g instanceof Polynomial)
+			return this.isEqual((Polynomial)g);
+		return false;
+	}
+	
+	public Polynomial clone() {
+		return new Polynomial(this.fx);
 	}
 	
 	/**
@@ -52,6 +236,10 @@ public class Polynomial {
 		return value(f,x,false);
 	}
 	
+	public double value(double x) {
+		return Polynomial.value(this.fx, x);
+	}
+	
 	/**
 	 * 根据多项式f,计算x点的值f(x)
 	 * @param f 多项式
@@ -71,6 +259,10 @@ public class Polynomial {
 		return y;
 	}
 	
+	public double value(double x, boolean round) {
+		return Polynomial.value(this.fx, x, round);
+	}
+	
 	/**
 	 * 根据多项式f,计算x[0:n-1]点的值f(x[0:n-1])
 	 * @param f 多项式
@@ -83,6 +275,10 @@ public class Polynomial {
 		for(int i=0;i<n;i++)
 			y[i]=value(f,x[i]);
 		return y;
+	}
+	
+	public double[] value(double[] xs) {
+		return Polynomial.value(this.fx, xs);
 	}
 	
 	/**
@@ -129,6 +325,10 @@ public class Polynomial {
 		return toString(f,var);
 	}
 	
+	public String toString() {
+		return Polynomial.toString(this.fx);
+	}
+	
 	/**
 	 * 将多项式转化为"f(x)=a0+a1x+ ... +an-1x^n-1"(记为str)的形式
 	 * @param f 多项式
@@ -165,12 +365,24 @@ public class Polynomial {
 		return str;
 	}
 	
+	public String toString(String var) {
+		return Polynomial.toString(this.fx, var);
+	}
+	
 	public static Double solveOne(double[] f) {
 		return solveOne(f, 0);
 	}
 	
+	public Double solveOne() {
+		return Polynomial.solveOne(this.fx);
+	}
+	
 	public static Double solveOne(double[] f, double start) {
 		return solveOne0(f, start);
+	}
+	
+	public Double solveOne(double strat) {
+		return Polynomial.solveOne(this.fx, strat);
 	}
 	
 	/**
