@@ -82,5 +82,48 @@ public class MatrixTest {
 		assertTrue(isEqual(kA, A2));
 		assertTrue(isEqual(kB, B2));
 	}
+	
+	@Test
+	public void test_eigenvalues1() {
+		show_log = true;
+		double[][] A = {
+			{ 2, -1,  0},
+			{-1,  2, -1},
+			{ 0, -1,  2}
+		};
+		showMatrix2D(A);
+		double[] lambda = eigenvalues(A);
+		showMatrix1D(lambda);
+	}
+	
+	@Test
+	public void test_eigenvalues2() {
+		double[][] A = {
+			{2, 8, 9},
+			{8, 3, 4},
+			{9, 4, 7}
+		};
+		double[] lambda = eigenvalues(A);
+		showMatrix1D(lambda);
+	}
+	
+	@Test
+	public void test_eigenvalues3() {
+		double[][] A = {
+			{ 7,  3, -2},
+			{ 3,  4, -1},
+			{-2, -1,  3}
+		};
+		double[] lambda = eigenvalues(A);
+		showMatrix1D(lambda);
+		
+		double[][] A2 = {
+			{-12,  3,  3},
+			{  3,  1, -2},
+			{  3, -2,  7}
+		};
+		double[] lambda2 = eigenvalues(A2);
+		showMatrix1D(lambda2);
+	}
 
 }

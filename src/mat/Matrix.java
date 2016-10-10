@@ -1,10 +1,16 @@
 package mat;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 
 public class Matrix {
+	
+	public static final double TOLERANCE = 1E-6;
+	public static final double LIKELY_ZERO = 1E-45;
+	public static boolean show_log = false;
 	
 	/**
 	 * complement(or cofactor,minor:余子式)<br>
@@ -126,14 +132,89 @@ public class Matrix {
 	}
 	
 	/**
-	 * 求方阵A的特征值(eigenvalues)<br>
+	 * 求对称方阵A的特征值(eigenvalues)<br>
 	 * (A - lambda * I)* X = o<br>
-	 * TODO: it's not implemented
-	 * @param A double[][] 待求矩阵,必须n*n
-	 * @return λ[i] double[][] 特征值
+	 * 用雅克比方法求对阵矩阵的特征值和特征向量<br>
+	 * @param A double[][] 待求矩阵,必须n*n,对称阵
+	 * @return λ double[] 特征值数组
 	 */
 	public static double[] eigenvalues(double[][] A){
-		return null;
+		if (A==null || A.length!=A[0].length) {
+			throw new IllegalArgumentException();
+		}
+		if (!isEqual(A, transpose(A))) {
+			throw new IllegalArgumentException("不是对称阵");
+		}
+		final int N = A.length;
+		List<double[][]> Rks = new ArrayList<double[][]>();
+		int itrTimes = 0;
+		while(true) {
+			// 计算非对角元素的平方和
+			double s = 0;
+			for (int i=0; i<N-1; i++) {
+				for (int j=i+1; j<N; j++) {
+					s += A[i][j]*A[i][j];
+				}
+			}
+			if (s < TOLERANCE) {
+				break;
+			}
+			// (1) 在A的非对角线元素中挑选主元（绝对值最大者或大于s/n）A[p][q]
+			double max = 0, valve = s/N;
+			int p=0, q=1;
+			boolean tbd = true;
+			for (int i=0; tbd && i<N-1; i++) {
+				for (int j=i+1; tbd && j<N; j++) {
+					double t = Math.abs(A[i][j]);
+					if (t > valve || t > max) {
+						max = t;
+						p = i;
+						q = j;
+					}
+					if (t > valve) {
+						tbd = false;
+						break;
+					}
+				}
+			}
+			if (max < TOLERANCE) {
+				break;
+			}
+			if (show_log)	System.out.printf("p=%d, q=%d, A[%d][%d]=%f\n", p+1, q+1, p+1, q+1, max);
+			// (2) h为转角弧度, 利用公式tan(2h)=2A[p][q]/(A[p][p]-A[q][q])求h,sin(h),cos(h)
+			double cosh, sinh;
+			if (Math.abs(A[p][p]-A[q][q]) < LIKELY_ZERO) {
+				double h = Math.signum(A[p][q]) * Math.PI / 4;
+				cosh = Math.cos(h);
+				sinh = Math.sin(h);
+			} else {
+				double tan2h = 2*A[p][q]/(A[p][p]-A[q][q]);
+				double cos2h = 1 / Math.sqrt(1 + tan2h*tan2h);
+				cosh = Math.sqrt(0.5*(1+cos2h));
+				sinh = 0.5*tan2h*cos2h/cosh;
+			}
+			if (show_log)	System.out.printf("h = %f(%f): sin(h)=%f, cos(h)=%f\n", Math.asin(sinh), Math.toDegrees(Math.asin(sinh)), sinh, cosh);
+			// (3) 生成转换矩阵R, 并旋转矩阵
+			double[][] R = makeIdentity(N);
+			R[p][p] = cosh;
+			R[p][q] = sinh;
+			R[q][p] = -sinh;
+			R[q][q] = cosh;
+			Rks.add(R);
+			if (show_log)	showMatrix2D(R);
+			double[][] tmpA = matrixMultiply(R, A);
+			A = matrixMultiply(tmpA, transpose(R));
+			if (show_log)	showMatrix2D(A);
+			
+			itrTimes++; // 累加迭代次数
+		}
+		if (show_log)	System.out.println("迭代次数：" + itrTimes);
+		
+		double[] lambda = new double[N];
+		for (int i=0; i<N; i++) {
+			lambda[i] = A[i][i];
+		}
+		return lambda;
 	}
 	
 	/**
