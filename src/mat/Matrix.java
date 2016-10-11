@@ -9,6 +9,7 @@ import java.util.StringTokenizer;
 public class Matrix {
 	
 	public static final double TOLERANCE = 1E-6;
+	public static final double TOLERANCE2 = 1E-15;
 	public static final double LIKELY_ZERO = 1E-45;
 	public static boolean show_log = false;
 	
@@ -215,6 +216,103 @@ public class Matrix {
 			lambda[i] = A[i][i];
 		}
 		return lambda;
+	}
+	
+	/**
+	 * 乘幂法求矩阵A的主特征值
+	 * @param A
+	 * @param u 任意非零初始向量
+	 * @return
+	 */
+	public static double mainEigenvalue(double[][] A, double[] u) {
+		if (A==null || u==null || A.length!=A[0].length || A.length != u.length) {
+			throw new IllegalArgumentException();
+		}
+		if (isZero(u)) {
+			throw new IllegalArgumentException("初始向量不能为零");
+		}
+		final int MAX_K = 60, EARLY_STAGE = 5;
+		int k = 0;
+		double lastMax = 0, maxUk = 0;
+		double[] vk0 = u.clone(), uk1 = vk0;
+		while(k<MAX_K) {
+			k++;
+			uk1 = matrixMultiply(A, vk0);
+			if (show_log) {
+				showMatrix1D(uk1);
+			}
+			maxUk = maxAbs(uk1)/maxAbs(vk0);
+//			if (Math.abs(maxUk) < TOLERANCE2) {
+//				break;
+//			}
+			if (show_log) {
+				System.out.printf("U%d=%f, U%d=%f\n", k-1, lastMax, k, maxUk);
+			}
+			vk0 = uk1;
+			if (k < EARLY_STAGE) { // if early iterations, we can judge in early stage
+				lastMax = maxUk;
+				continue;
+			}
+			if (Math.abs(maxUk-lastMax) < TOLERANCE2) {
+				break;
+			}
+			lastMax = maxUk;
+		}
+		if (show_log) {
+			showMatrix1D(normalize(uk1));
+//			showMatrix1D(standardize(uk1));
+		}
+		return maxUk;
+	}
+	
+	/**
+	 * 向量是否为空，或分量都为零
+	 * @param x
+	 * @return
+	 */
+	public static boolean isZero(double[] x) {
+		if (x==null || x.length==0) {
+			return true;
+		}
+		boolean flag = true;
+		for (int i=0; flag && i<x.length; i++) {
+			flag = flag && (x[i] == 0.0);
+		}
+		return flag;
+	}
+	
+	/**
+	 * 矩阵是否为空，或值都为零
+	 * @param A
+	 * @return
+	 */
+	public static boolean isZero(double[][] A) {
+		if (A==null || A.length==0 || A[0].length==0) {
+			return true;
+		}
+		boolean flag = true;
+		for (int i=0; flag && i<A.length; i++) {
+			for (int j=0; flag && j<A[i].length; j++) {
+				flag = flag && (A[i][j] == 0.0);
+			}
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断矩阵是否是方阵
+	 * @param A
+	 * @return
+	 */
+	public static boolean isSquare(double[][] A) {
+		if (A==null || A.length==0 || A[0].length==0) {
+			throw new IllegalArgumentException();
+		}
+		boolean flag = true;
+		for (int i=0; flag && i<A.length; i++) {
+			flag = flag && (A.length == A[i].length);
+		}
+		return flag;
 	}
 	
 	/**
@@ -636,6 +734,19 @@ public class Matrix {
 		}
 		return kA;
 	}
+
+	/**
+	 * 向量与数相乘k*x
+	 * @param x
+	 * @return k*x
+	 */
+	public static double[] multiply(double[] x, double k) {
+		double[] y = new double[x.length];
+		for (int i=0; i<x.length; i++) {
+			y[i] = x[i] * k;
+		}
+		return y;
+	}
 	
 	/**
 	 * 同型矩阵相加C=A+B
@@ -675,9 +786,56 @@ public class Matrix {
 	}
 	
 	/**
-	 * 计算向量x的∞范式
+	 * 向量归一化
+	 * @param x
+	 * @return
+	 */
+	public static double[] normalize(double[] x) {
+		if (isZero(x)) {
+			throw new IllegalArgumentException("向量不能为零");
+		}
+		double max = maxAbs(x);
+		double[] y = new double[x.length];
+		for (int i=0; i<x.length; i++) {
+			y[i] = x[i]/max;
+		}
+		return y;
+	}
+	
+	/**
+	 * 向量规范化,向量标准化
+	 * @param x
+	 * @return
+	 */
+	public static double[] standardize(double[] x) {
+		if (isZero(x)) {
+			throw new IllegalArgumentException("向量不能为零");
+		}
+		double d = norm_2(x);
+		double[] y = new double[x.length];
+		for (int i=0; i<x.length; i++) {
+			y[i] = x[i]/d;
+		}
+		return y;
+	}
+	
+	/**
+	 * 计算向量x的绝对值最大的分量(区别向量的无穷范数)
 	 * @param x 向量
-	 * @return x的∞范式
+	 * @return x[index(max{abs(x[i])})]
+	 */
+	public static double maxAbs(double[] x){
+		int max=0,n=x.length;
+		for(int i=1;i<n;i++)
+			if(Math.abs(x[i]) > Math.abs(x[max]))
+				max=i;
+		return x[max];
+	}
+	
+	/**
+	 * 计算向量x的∞范数(max{abs(x[i])})
+	 * @param x 向量
+	 * @return x的∞范数
 	 */
 	public static double norm_00(double[] x){
 		int max=0,n=x.length;
@@ -688,10 +846,10 @@ public class Matrix {
 	}
 	
 	/**
-	 * 计算矩阵A的∞范式<br>
+	 * 计算矩阵A的∞范数<br>
 	 * (行范数),A每一行元素绝对值之和的最大值
 	 * @param A 矩阵
-	 * @return A的∞范式
+	 * @return A的∞范数
 	 */
 	public static double norm_00(double[][] A){
 		int m=A.length,n=A[0].length;
@@ -709,7 +867,7 @@ public class Matrix {
 	}
 	
 	/**
-	 * 计算向量x的1范式
+	 * 计算向量x的1范数
 	 * @param x  向量
 	 * @return x的1_norm
 	 */
@@ -721,10 +879,10 @@ public class Matrix {
 	}
 	
 	/**
-	 * 计算矩阵A的1范式<br>
+	 * 计算矩阵A的1范数<br>
 	 * (列范数)，A每一列元素绝对值之和的最大值
 	 * @param A 矩阵
-	 * @return A的1范式
+	 * @return A的1范数
 	 */
 	public static double norm_1(double[][] A){
 		int m=A.length,n=A[0].length;
@@ -742,9 +900,9 @@ public class Matrix {
 	}
 	
 	/**
-	 * 计算向量x的2范式
+	 * 计算向量x的2范数
 	 * @param x 向量
-	 * @return x的2范式
+	 * @return x的2范数
 	 */
 	public static double norm_2(double[] x){
 		int n=x.length;double sum=0,res=0;
@@ -755,11 +913,11 @@ public class Matrix {
 	}
 	
 	/**
-	 * 计算矩阵A的2范式<br>
+	 * 计算矩阵A的2范数<br>
 	 * (谱范数,即A'A特征值λi中最大者λm的平方根,其中A'为A的转置矩阵). <br>
 	 * TODO: it's not implemented
 	 * @param A 矩阵
-	 * @return A的2范式
+	 * @return A的2范数
 	 */
 	public static double norm_2(double[][] A){
 		double max=0;

@@ -93,6 +93,7 @@ public class MatrixTest {
 		};
 		showMatrix2D(A);
 		double[] lambda = eigenvalues(A);
+		// 3.4142  0.5858	2
 		showMatrix1D(lambda);
 	}
 	
@@ -124,6 +125,50 @@ public class MatrixTest {
 		};
 		double[] lambda2 = eigenvalues(A2);
 		showMatrix1D(lambda2);
+	}
+	
+	@Test
+	public void test_mainEigenvalues1() {
+		show_log = true;
+		double[][] A = {
+			{ 2, -1,  0},
+			{-1,  2, -1},
+			{ 0, -1,  2}
+		};
+		double[] u = {1, 0, 1};
+		showMatrix2D(A);
+		double mainLambda = mainEigenvalue(A, u);
+		// 3.414214
+		System.out.println("main eigenvalue is " + mainLambda);
+	}
+	
+	@Test
+	public void test_mainEigenvalues2() {
+		show_log = true;
+		double[][] A = {
+			{ 4, -1,  1},
+			{-1,  3, -2},
+			{ 1, -2,  3}
+		};
+		double[] u = {1, 1, 1};
+		showMatrix2D(A);
+		double mainLambda = mainEigenvalue(A, u);
+		// 6
+		System.out.println("main eigenvalue is " + mainLambda);
+		System.out.println(mainLambda-6.0);
+	}
+	
+	@Test
+	public void test_mainEigenvalues3() {
+		double[][] A = {
+			{2, 8, 9},
+			{8, 3, 4},
+			{9, 4, 7}
+		};
+		double[] u = {1, 1, 1};
+		showMatrix2D(A);
+		double mainLambda = mainEigenvalue(A, u);
+		System.out.println("main eigenvalue is " + mainLambda);
 	}
 
 }
