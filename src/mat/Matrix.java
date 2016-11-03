@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 public class Matrix {
 	
 	public static final double TOLERANCE = 1E-6;
-	public static final double TOLERANCE2 = 1E-15;
+	public static final double EPSILON = 1/(1<<52);  // almost 2.2204460492503130808472633361816e-16 (Number.EPSILON from js)
 	public static final double LIKELY_ZERO = 1E-45;
 	public static boolean show_log = false;
 	
@@ -242,7 +242,7 @@ public class Matrix {
 				showMatrix1D(uk1);
 			}
 			maxUk = maxAbs(uk1)/maxAbs(vk0);
-//			if (Math.abs(maxUk) < TOLERANCE2) {
+//			if (Math.abs(maxUk) < EPSILON) {
 //				break;
 //			}
 			if (show_log) {
@@ -253,7 +253,7 @@ public class Matrix {
 				lastMax = maxUk;
 				continue;
 			}
-			if (Math.abs(maxUk-lastMax) < TOLERANCE2) {
+			if (Math.abs(maxUk-lastMax) < EPSILON) {
 				break;
 			}
 			lastMax = maxUk;
