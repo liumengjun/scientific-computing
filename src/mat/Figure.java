@@ -1,6 +1,9 @@
 package mat;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.*;
 
 /**
@@ -9,6 +12,7 @@ import javax.swing.*;
  */
 @SuppressWarnings("serial")
 public class Figure extends JFrame{
+	private static int figure_count = 0;
 	private double[] poly;			//多项式
 	private double[] lineX,lineY;	//线
 	private double[] pointX,pointY;	//点
@@ -29,8 +33,18 @@ public class Figure extends JFrame{
 		super();
 		this.setTitle("函数图象");
 		this.setSize(400,300);
-		this.setLocation(200,200);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setLocation(200 + figure_count*30,200 + figure_count*30);
+//		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		figure_count++;
+		this.addWindowListener(new WindowAdapter() {
+			 public void windowClosing(WindowEvent e) {
+				 if (figure_count <= 1) {
+					 System.exit(0);
+				 } else {
+					 figure_count--;
+				 }
+			 }
+		});
 		
 		unitPixels=30;	//在我的机器上,一厘米大约30像素
 		userOrigin=false;
@@ -47,11 +61,11 @@ public class Figure extends JFrame{
 	 * 主画图方法
 	 */
 	public void paint(Graphics g){
-		this.paintComponents(g);
-		//添加一个透明的Panel，只为测试
-		JPanel p = new JPanel();
-		p.setOpaque(true);
-		this.add(p);
+		super.paint(g);
+//		//添加一个透明的Panel，只为测试
+//		JPanel p = new JPanel();
+//		p.setOpaque(true);
+//		this.add(p);
 		if(!userOrigin){
 			origin.Corner_X=getWidth()/2;
 			origin.Corner_Y=getHeight()/2;

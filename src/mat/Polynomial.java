@@ -386,7 +386,8 @@ public class Polynomial {
 	}
 	
 	/**
-	 * 牛顿逼近法
+	 * 牛顿逼近法<br>
+	 * 利用牛顿迭代法(Newton's method)近似求解方程f(x)=0。<br>
 	 * NOTE: 需要选取恰当的迭代起始点
 	 * @param f
 	 * @param x
